@@ -4,7 +4,34 @@ import sys
 #http://aima.cs.berkeley.edu/python/csp.html
 #https://sandipanweb.wordpress.com/2017/03/17/solving-sudoku-as-a-constraint-satisfaction-problem-using-constraint-propagation-with-arc-consistency-checking-and-then-backtracking-with-minimum-remaning-value-heuristic-and-forward-checking/
 #https://www.techwithtim.net/tutorials/python-programming/sudoku-solver-backtracking/
-DIMENSION = 9
+rows = "ABCDEFGHI"
+cols = "123456789"
+row_blocks = ("ABC","DEF","GHI")
+col_blocks = ("123","456","789")
+
+
+class Sudoku:
+    def __init__(self):
+        self.variables = []
+        self.domains = {}
+        self.constraints = []
+        self.neighbors = {}
+    """
+    Sudoku Representation:
+      1 2 3 4 5 6 7 8 9
+    A . . . . . . . . .
+    B . . . . . . . . .
+    C . . . . . . . . .
+    D . . . . . . . . .
+    E . . . . . . . . .
+    F . . . . . . . . .
+    G . . . . . . . . .
+    H . . . . . . . . .
+    I . . . . . . . . .
+    AC3:
+    """
+    
+
 def get_empty(board):
     for i in range(DIMENSION):
         for j in range(DIMENSION):
