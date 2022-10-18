@@ -32,7 +32,7 @@ class Sudoku:
         self.domains = {}
         self.constraints = []
         self.neighbors = {}
-
+        board = list(grid)
         #intiialize variables for each box, "A1,A2,A3..."
         self.variables = self.concatenate(rows,columns)
         #print(len(self.variables))
@@ -44,23 +44,43 @@ class Sudoku:
                 self.domains[box] = DOMAIN
             else:
                 self.domains[box] = int(grid[index])
-        #print(self.domains)
-        #Building constraints
-        #Rows, Columns, and Blocks (3 parts)
-        #print("Printing Constraints")
-        c1 = self.getColumnConstraints()#A1,B1,C1...
-        #print(c1)
-        c2 = self.getRowConstraints()#A1,A2,A3,A4...
-        #print(c2)
-        c3 = self.getBlockConstraints()#A1,A2,A3,B1,B2,B3,C1,C2,C3... (The 3x3 blocks)
-        #print(c3)
-        print()
-        all_constraints = (c1+c2+c3)
-        print(all_constraints)
-        print(len(c1),len(c2),len(c3))
-        print(len(all_constraints))
 
+        c1 = self.getColumnConstraints()#A1,B1,C1...
+        c2 = self.getRowConstraints()#A1,A2,A3,A4...
+        c3 = self.getBlockConstraints()#A1,A2,A3,B1,B2,B3,C1,C2,C3... (The 3x3 blocks)
+        all_constraints = (c1+c2+c3)
+        all_binary_constraints = []
+        for constraint in all_constraints:
+            binaries = []
+            for binary in itertools.permutations(constraint,2):
+                binaries.append(binary)
+            for binary in binaries:
+                arr = list(binary)
+                if arr not in all_binary_constraints:
+                    all_binary_constraints.append([arr[0],arr[1]])
+        #print(all_binary_constraints)
+        #print(len(all_binary_constraints))
+        self.constraints = self.getBoardConstraints()
+        print(self.constraints)
+        print(len(self.constraints))
         
+
+    def getBoardConstraints(self):
+        c1 = self.getColumnConstraints()#A1,B1,C1...
+        c2 = self.getRowConstraints()#A1,A2,A3,A4...
+        c3 = self.getBlockConstraints()#A1,A2,A3,B1,B2,B3,C1,C2,C3... (The 3x3 blocks)
+        all_constraints = (c1+c2+c3)
+        all_binary_constraints = []
+        for constraint in all_constraints:
+            binaries = []
+            for binary in itertools.permutations(constraint,2):
+                binaries.append(binary)
+            for binary in binaries:
+                arr = list(binary)
+                if arr not in all_binary_constraints:
+                    all_binary_constraints.append([arr[0],arr[1]])
+        return all_binary_constraints
+
 
     def getColumnConstraints(self):
         arr = []
