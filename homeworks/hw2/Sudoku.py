@@ -72,7 +72,7 @@ class Sudoku:
             if n not in assignment:
                 if val in self.domains[n]:
                     self.domains[n].remove(val)
-                    self.pruned[var].append((n,val))
+                    self.pruned[box].append((n,val))
 
     def assign(self, var,val,assignment):
         assignment[var] = val
@@ -139,6 +139,12 @@ class Sudoku:
                 arr.append(i+j)
         return arr
     
+    def getNumOfConflicts(self,s,box,val):
+        c = 0
+        for n in s.neighbors[box]:
+            if len(s.domains[n]) > 1 and val in s.domains[n]:
+                c = c + 1
+        return c
 
 
 def isNotEqual(x,y):
@@ -183,15 +189,34 @@ def ac3(sudoku_board):
     
     return True
 
-def getNumOfConflicts(s,box,val):
-    c = 0
-    for n in s.neighbors[box]:
-        if len(s.domains[n]) > 1 and val in s.domains[n]:
-            c = c + 1
-    return c
 
 
+def backtrack(assignment, sudoku):
+    if len(assignment) == len(sudoku.variables):
+        return assignment
+    var = select_unassigned_variable(assignment, sudoku)
+    for value in order_domain_values(sudoku, var):
+        if sudoku.isConsistent(assignment, value, var):
+            sudoku.assign(var, value, assignment)
+            result = backtrack(assignment, sudoku)
+            if result:
+                return result
+            sudoku.unassign(var, assignment)
+    return False
 
+
+# Most Constrained Variable heuristic
+# Pick the unassigned variable that has fewest legal values remaining.
+def select_unassigned_variable(assignment, sudoku):
+    unassigned = [v for v in sudoku.variables if v not in assignment]
+    return min(unassigned, key=lambda var: len(sudoku.domains[var]))
+
+# Least Constraining Value heuristic
+# Prefers the value that rules out the fewest choices for the neighboring variables in the constraint graph.
+def order_domain_values(sudoku, var):
+    if len(sudoku.domains[var]) == 1:
+        return sudoku.domains[var]
+    return sorted(sudoku.domains[var], key=lambda val: sudoku.getNumOfConflicts(sudoku, var, val))
 ##########################################################################################################
 if __name__ == "__main__":
     p1 = "..3.2.6..9..3.5..1..18.64....81.29..7.......8..67.82....26.95..8..2.3..9..5.1.3.."
@@ -200,7 +225,6 @@ if __name__ == "__main__":
     p2 = p2.replace(".","0")
     p3 = "000530000005000600000190503000004000000000164100370800008000040010000008004700921"
     print(len(p3))
-   
     test = Sudoku(p3)
     #print(test.domains)
     print("_______________________________________________")
@@ -216,5 +240,23 @@ if __name__ == "__main__":
                     print()
         else:
             print("Hey atleast u tried")
+            assignment = {}
+            for x in test.variables:
+                if len(test.domains[x]) == 1:
+                    assignment[x] = test.domains[x][0]
+            assignment = backtrack(assignment, test)
+            for d in test.domains:
+                test.domains[d] = assignment[d] if len(d) > 1 else test.domains[d]
+            if assignment:
+                print("ALMOST DONE")
+                #print(test.variables)
+                c = 0
+                for v in test.variables:
+                    print(test.domains[v], end = " ")
+                    c+= 1
+                    if c%9 == 0:
+                        print()
+
+
 
             
