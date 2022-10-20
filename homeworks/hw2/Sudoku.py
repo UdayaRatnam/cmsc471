@@ -1,3 +1,5 @@
+#https://github.com/speix/sudoku-solver
+#https://github.com/stressGC/Python-AC3-Backtracking-CSP-Sudoku-Solver
 import itertools
 import sys
 #sources used
