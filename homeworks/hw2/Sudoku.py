@@ -8,9 +8,8 @@ rows = "ABCDEFGHI"
 columns = "123456789"
 row_blocks = ("ABC","DEF","GHI")
 column_blocks = ("123","456","789")
-DOMAIN = list(range(1,10))
-characters = "ABCDEFGHI"
-numbers = "123456789"
+#characters = "ABCDEFGHI"
+#numbers = "123456789"
 
 class Sudoku:
     """
@@ -40,28 +39,12 @@ class Sudoku:
         #print("_____________________________________")
         #initializing possible domain for each box in sudoku grid
         for index,box in enumerate(self.variables):
-            if grid[index] == '0':
-                self.domains[box] = DOMAIN
+            if board[index] == '0':
+                self.domains[box] = list(range(1,10))
             else:
-                self.domains[box] = int(grid[index])
-
-        """
-        c1 = self.getColumnConstraints()#A1,B1,C1...
-        c2 = self.getRowConstraints()#A1,A2,A3,A4...
-        c3 = self.getBlockConstraints()#A1,A2,A3,B1,B2,B3,C1,C2,C3... (The 3x3 blocks)
-        all_constraints = (c1+c2+c3)
-        all_binary_constraints = []
-        for constraint in all_constraints:
-            binaries = []
-            for binary in itertools.permutations(constraint,2):
-                binaries.append(binary)
-            for binary in binaries:
-                arr = list(binary)
-                if arr not in all_binary_constraints:
-                    all_binary_constraints.append([arr[0],arr[1]])
-        #print(all_binary_constraints)
-        #print(len(all_binary_constraints))
-        """
+                self.domains[box] = [int(board[index])]
+        
+        #self.domains = {v: list(range(1, 10)) if board[i] == '0' else [int(board[i])] for i, v in enumerate(self.variables)}
 
         self.constraints = self.getBoardConstraints()
         #print(self.constraints)
@@ -109,7 +92,7 @@ class Sudoku:
 
     def isDone(self):
         for x in self.variables:
-            if len(self.domains[x] != 1):
+            if len(self.domains[x]) > 1:
                 return False
         return True
 
@@ -164,11 +147,14 @@ def isNotEqual(x,y):
 def revise(sudoku, xi, xj):
     revised = False
     for x in sudoku.domains[xi]:
+        #print(x)
+        #print("HEllo")
         if not any([isNotEqual(x,y) for y in sudoku.domains[xj]]):
             sudoku.domains[xi].remove(x)
             revised = True
-
+        
     return revised
+    
 """
 def revise(s,x,y):
     revised = False
@@ -181,18 +167,20 @@ def revise(s,x,y):
 """
 
 def ac3(sudoku_board):
-
+    print("PLEASE TELL ME WE REACHED HERE")
     queue = list(sudoku_board.constraints)
-    while queue:
+    while queue:  
         i,j = queue.pop(0)
-        print(i,j)
+        #print(i,j)
         if revise(sudoku_board,i,j):
-            print("after if")
-            if len(s.domains[i]) == 0:
+            #print("after if")
+            if len(sudoku_board.domains[i]) == 0:
+                print("Okay HOW ABOUT HERE")
                 return False  
             for k in sudoku_board.neighbors[i]:
                 if k != i:
                     queue.append([k,i])
+    
     return True
 
 def getNumOfConflicts(s,box,val):
@@ -203,12 +191,30 @@ def getNumOfConflicts(s,box,val):
     return c
 
 
+
+##########################################################################################################
 if __name__ == "__main__":
     p1 = "..3.2.6..9..3.5..1..18.64....81.29..7.......8..67.82....26.95..8..2.3..9..5.1.3.."
     p2 = "...26.7.168..7..9.19...45..82.1...4...46.29...5...3.28..93...74.4..5..367.3.18..."
     p1 = p1.replace(".","0")
     p2 = p2.replace(".","0")
+    p3 = "000530000005000600000190503000004000000000164100370800008000040010000008004700921"
+    print(len(p3))
    
-    test = Sudoku(p1)
+    test = Sudoku(p3)
+    #print(test.domains)
+    print("_______________________________________________")
+    if ac3(test):
+        print("We made it this far")
+        if test.isDone():
+            print(test.variables)
+            c = 0
+            for v in test.variables:
+                print(test.domains[v][0], end = " ")
+                c+= 1
+                if c%9 == 0:
+                    print()
+        else:
+            print("Hey atleast u tried")
 
-    print(ac3(test))
+            
