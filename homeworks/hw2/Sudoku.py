@@ -132,16 +132,16 @@ class Sudoku:
             if len(s.domains[n]) > 1 and val in s.domains[n]:
                 c = c + 1
         return c
-def revise(sudoku, xi, xj):
+def revise(sudoku, a, b):
     revised = False
-    for x in sudoku.domains[xi]:
+    for x in sudoku.domains[a]:
         remove_element = True
-        for y in sudoku.domains[xj]:
+        for y in sudoku.domains[b]:
             if x != y:
                 remove_element = False         
         if remove_element:
             revised = True
-            sudoku.domains[xi].remove(x)
+            sudoku.domains[a].remove(x)
     return revised
 def ac3(sudoku_board):
     queue = list(sudoku_board.constraints)
@@ -194,8 +194,7 @@ def print_board(boardObj, solved):
         if c % 9 == 0:
             c = 0
             print()
-            if d%27 == 0:
-                d = 0
+            if d%27 == 0 and d!= 81:
                 print("----------------------")
     print()
 def print_str(sudoku_str):
@@ -211,8 +210,7 @@ def print_str(sudoku_str):
         if c % 9 == 0:
             c = 0
             print()
-            if d % 27 == 0:
-                d = 0
+            if d % 27 == 0 and d != 81:
                 print("----------------------")
     print()
 ##########################################################################################################
@@ -220,19 +218,21 @@ if __name__ == "__main__":
     p1 = "..3.2.6..9..3.5..1..18.64....81.29..7.......8..67.82....26.95..8..2.3..9..5.1.3.."
     p2 = "...26.7.168..7..9.19...45..82.1...4...46.29...5...3.28..93...74.4..5..367.3.18..."
     p3 = "4.....3.....8.2......7........1...8734.......6........5...6........1.4...82......"
-    test = Sudoku(p3)
-    print("Sudoku Board Puzzle 1 -- Before Solving")
-    print_str(p3)
-    arc_consistency = ac3(test)
-    done = test.isDone()
+    #print("Enter a string of length of 81 characters")
+    p = input("Enter a string of length of 81 characters: ")
+    sud = Sudoku(p)
+    print("Sudoku Board Puzzle -- Before Solving")
+    print_str(p)
+    arc_consistency = ac3(sud)
+    done = sud.isDone()
     if done:
         print("AC3 WORKS")
-        print_board(test,done)
+        print_board(sud,done)
     else:
         print("AC3 FAILED")
         print("STARTING THE BACKTRACK")
         assignment = {}
-        assignment = backtrack(assignment, test)
-        for d in test.domains:
-            test.domains[d] = assignment[d]
-        print_board(test, done)
+        assignment = backtrack(assignment, sud)
+        for d in sud.domains:
+            sud.domains[d] = assignment[d]
+        print_board(sud, done)
